@@ -11,32 +11,27 @@ import net.minecraftforge.fml.common.gameevent.TickEvent;
 
 @Mod(modid = WinterWeatherMod.MODID, version = WinterWeatherMod.VERSION)
 public class WinterWeatherMod {
+
     public static final String MODID = "winter_weather";
     public static final String VERSION = "1.0";
+
     private final SnowRenderHandler snowRenderer = new SnowRenderHandler();
-    private Sk1erMod sk1erMod;
-    private Minecraft mc;
-    ;
+    private final Minecraft mc = Minecraft.getMinecraft();
 
     @EventHandler
     public void init(FMLInitializationEvent event) {
-        sk1erMod = new Sk1erMod(MODID, VERSION, "Winter Weather Mod");
-        sk1erMod.checkStatus();
         MinecraftForge.EVENT_BUS.register(this);
-        mc = Minecraft.getMinecraft();
-
     }
 
     @SubscribeEvent
     public void onWorldLoad(WorldEvent.Load event) {
-        event.world.provider.setWeatherRenderer(snowRenderer);
+        event.world.provider.setWeatherRenderer(this.snowRenderer);
     }
 
     @SubscribeEvent
     public void onClientTick(TickEvent.ClientTickEvent event) {
-        if (event.phase == TickEvent.Phase.END) {
-            snowRenderer.rendererUpdateCount++;
+        if (event.phase == TickEvent.Phase.END && !mc.isGamePaused()) {
+            this.snowRenderer.incrementSnowUpdateCounter();
         }
     }
-
 }

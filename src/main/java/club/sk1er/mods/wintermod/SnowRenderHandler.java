@@ -19,10 +19,10 @@ import java.util.Random;
 public class SnowRenderHandler extends IRenderHandler {
 
     private final Random random = new Random();
-    private final ResourceLocation locationSnowPng = new ResourceLocation("textures/environment/snow.png");
-    public int rendererUpdateCount;
-    private float[] rainXCoords = new float[1024];
-    private float[] rainYCoords = new float[1024];
+    private final ResourceLocation locationSnowPng = new ResourceLocation("winterweather", "snow.png");
+    private int rendererUpdateCount;
+    private float[] snowX = new float[1024];
+    private float[] snowY = new float[1024];
 
     public SnowRenderHandler() {
         for (int i = 0; i < 32; ++i) {
@@ -30,8 +30,8 @@ public class SnowRenderHandler extends IRenderHandler {
                 float f = (float) (j - 16);
                 float f1 = (float) (i - 16);
                 float f2 = MathHelper.sqrt_float(f * f + f1 * f1);
-                this.rainXCoords[i << 5 | j] = -f1 / f2;
-                this.rainYCoords[i << 5 | j] = f / f2;
+                this.snowX[i << 5 | j] = -f1 / f2;
+                this.snowY[i << 5 | j] = f / f2;
             }
         }
     }
@@ -62,7 +62,7 @@ public class SnowRenderHandler extends IRenderHandler {
         }
 
         int j1 = -1;
-        float f1 = (float) rendererUpdateCount + partialTicks;
+        float f1 = (float) this.rendererUpdateCount + partialTicks;
         worldrenderer.setTranslation(-d0, -d1, -d2);
         GlStateManager.color(1.0F, 1.0F, 1.0F, 1.0F);
         BlockPos.MutableBlockPos blockpos$mutableblockpos = new BlockPos.MutableBlockPos();
@@ -70,8 +70,8 @@ public class SnowRenderHandler extends IRenderHandler {
         for (int k1 = k - i1; k1 <= k + i1; ++k1) {
             for (int l1 = i - i1; l1 <= i + i1; ++l1) {
                 int i2 = (k1 - k + 16) * 32 + l1 - i + 16;
-                double d3 = (double) rainXCoords[i2] * 0.5D;
-                double d4 = (double) rainYCoords[i2] * 0.5D;
+                double d3 = (double) this.snowX[i2] * 0.5D;
+                double d4 = (double) this.snowY[i2] * 0.5D;
                 blockpos$mutableblockpos.set(l1, 0, k1);
 
                 int j2 = world.getPrecipitationHeight(blockpos$mutableblockpos).getY();
@@ -99,7 +99,7 @@ public class SnowRenderHandler extends IRenderHandler {
                     if (j1 != 1) {
 
                         j1 = 1;
-                        mc.getTextureManager().bindTexture(locationSnowPng);
+                        mc.getTextureManager().bindTexture(this.locationSnowPng);
                         worldrenderer.begin(7, DefaultVertexFormats.PARTICLE_POSITION_TEX_COLOR_LMAP);
                     }
 
@@ -131,5 +131,9 @@ public class SnowRenderHandler extends IRenderHandler {
         GlStateManager.disableBlend();
         GlStateManager.alphaFunc(516, 0.1F);
         renderer.disableLightmap();
+    }
+
+    public void incrementSnowUpdateCounter() {
+        this.rendererUpdateCount++;
     }
 }
